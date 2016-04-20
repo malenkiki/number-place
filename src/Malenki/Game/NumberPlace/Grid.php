@@ -215,7 +215,7 @@ class Grid
         return $area;
     }
 
-    protected function checkUniqFull($idx, $type)
+    protected function getCollection($idx, $type)
     {
         if ($type === 'row') {
             $collection = $this->getRowAt($idx);
@@ -226,21 +226,60 @@ class Grid
         }
         
         if ($type === 'diagonal') {
-            if ($this->use_diagonal) {
-                $collection = $this->getDiagonalAt($idx);
-            } else {
-                throw new \RuntimeException('Cannot check diagonal: option not set!');
-            }
+            $collection = $this->getDiagonalAt($idx);
         }
 
         if ($type === 'area') {
             $collection = $this->getAreaAt($idx);
         }
 
+        return $collection;
+    }
+
+    protected function checkUniqFull($idx, $type)
+    {
+        if ($type === 'diagonal') {
+            if (!$this->use_diagonal) {
+                throw new \RuntimeException('Cannot check diagonal: option not set!');
+            }
+        }
+        $collection = $this->getCollection($idx, $type);
         $collection = array_map(function($v){return "$v";}, $collection);
         
         return (count(array_unique($collection)) === count($collection));
     }
+
+    protected function duplicatesCountFor($idx, $type)
+    {
+        if ($type === 'diagonal') {
+            if (!$this->use_diagonal) {
+                throw new \RuntimeException('Cannot get duplicates for diagonals: option not set!');
+            }
+        }
+        $collection = $this->getCollection($idx, $type);
+        $collection = array_map(function($v){return "$v";}, $collection);
+        
+        return count($collection) - count(array_unique($collection));
+    }
+
+    protected function availablesFor($idx, $type)
+    {
+        if ($type === 'diagonal') {
+            if (!$this->use_diagonal) {
+                throw new \RuntimeException('Cannot get duplicates for diagonals: option not set!');
+            }
+        }
+        $collection = $this->getCollection($idx, $type);
+
+        foreach ($collection as $box) {
+
+        }
+
+        $collection = array_map(function($v){return "$v";}, $collection);
+        
+        return $out;
+    }
+
 
     public function checkRowAt($idx)
     {
