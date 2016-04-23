@@ -107,7 +107,7 @@ class GridTest extends \PHPUnit_Framework_TestCase
      */
     public function testCheckSymbolsUsingNotArrayShouldRaiseInvalidArgumentException()
     {
-        Grid::checkSymbols('azerty', '.');
+        Grid::checkSymbols('azerty', '.', 9);
     }
 
     /**
@@ -116,25 +116,25 @@ class GridTest extends \PHPUnit_Framework_TestCase
      */
     public function testCheckSymbolsUsingNotStringHasJokerShouldRaiseInvalidArgumentException()
     {
-        Grid::checkSymbols(['a','z','e','r','t','y','u','i','o'], new \stdClass());
+        Grid::checkSymbols(['a','z','e','r','t','y','u','i','o'], new \stdClass(), 9);
     }
 
     /**
      * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessageRegExp /must have 9/
+     * @expectedExceptionMessageRegExp /require \d symbols/
      */
     public function testCheckSymbolsUsingArrayLessThan9ShouldRaiseInvalidArgumentException()
     {
-        Grid::checkSymbols(['a','z','e','r','t','y'], '.');
+        Grid::checkSymbols(['a','z','e','r','t','y'], '.', 9);
     }
 
     /**
      * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessageRegExp /must have 9/
+     * @expectedExceptionMessageRegExp /require \d symbols/
      */
     public function testCheckSymbolsUsingArrayMoreThan9ShouldRaiseInvalidArgumentException()
     {
-        Grid::checkSymbols(['a','z','e','r','t','y','u','i','o','p'], '.');
+        Grid::checkSymbols(['a','z','e','r','t','y','u','i','o','p'], '.', 9);
     }
 
     /**
@@ -143,7 +143,7 @@ class GridTest extends \PHPUnit_Framework_TestCase
      */
     public function testCheckSymbolsUsingArrayHavingDuplicatesShouldRaiseInvalidArgumentException()
     {
-        Grid::checkSymbols(['a','z','e','r','t','y','a','y','r'], '.');
+        Grid::checkSymbols(['a','z','e','r','t','y','a','y','r'], '.', 9);
     }
 
     /**
@@ -152,12 +152,12 @@ class GridTest extends \PHPUnit_Framework_TestCase
      */
     public function testCheckSymbolsUsingArrayContainingJokerCharShouldRaiseInvalidArgumentException()
     {
-        Grid::checkSymbols(['a','z','e','r','t','y','u','.','o'], '.');
+        Grid::checkSymbols(['a','z','e','r','t','y','u','.','o'], '.', 9);
     }
     
     public function testCheckSymbolsUsingValidArraySymbolsAndValidJokerCharShouldReturnTrue()
     {
-        $this->assertTrue(Grid::checkSymbols(['a','z','e','r','t','y','u','i','o'], '.'));
+        $this->assertTrue(Grid::checkSymbols(['a','z','e','r','t','y','u','i','o'], '.', 9));
     }
 
     /**
@@ -209,48 +209,6 @@ class GridTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Grid must have 9 rows!
-     */
-    public function testCheckGridVersusSymbolsUsingTooLessRowsShouldRaiseInvalidArgumentException()
-    {
-        Grid::checkGridVersusSymbols(
-            [['a','z','e','r','t','y','u','i','o']], 
-            ['a','z','e','r','t','y','u','i','o'],
-            '.'
-        );
-    }
-
-
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Grid must have 9 rows!
-     */
-    public function testCheckGridVersusSymbolsUsingTooMuchRowsShouldRaiseInvalidArgumentException()
-    {
-        Grid::checkGridVersusSymbols(
-            [
-                ['a','z','e','r','t','y','u','i','o'],
-                ['a','z','e','r','t','y','u','i','o'],
-                ['a','z','e','r','t','y','u','i','o'],
-                ['a','z','e','r','t','y','u','i','o'],
-                ['a','z','e','r','t','y','u','i','o'],
-                ['a','z','e','r','t','y','u','i','o'],
-                ['a','z','e','r','t','y','u','i','o'],
-                ['a','z','e','r','t','y','u','i','o'],
-                ['a','z','e','r','t','y','u','i','o'],
-                ['a','z','e','r','t','y','u','i','o'],
-                ['a','z','e','r','t','y','u','i','o'],
-                ['a','z','e','r','t','y','u','i','o'],
-                ['a','z','e','r','t','y','u','i','o'],
-                ['a','z','e','r','t','y','u','i','o']
-            ], 
-            ['a','z','e','r','t','y','u','i','o'],
-            '.'
-        );
-    }
-
-    /**
-     * @expectedException \InvalidArgumentException
      * @expectedExceptionMessage Grid’s row must be an array!
      */
     public function testCheckGridVersusSymbolsUsingAtLeastInvalidRowsTypeShouldRaiseInvalidArgumentException()
@@ -266,52 +224,6 @@ class GridTest extends \PHPUnit_Framework_TestCase
                 ['a','z','e','r','t','y','u','i','o'],
                 ['a','z','e','r','t','y','u','i','o'],
                 ['a','z','e','r','t','y','u','i','o'],
-            ], 
-            ['a','z','e','r','t','y','u','i','o'],
-            '.'
-        );
-    }
-
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Grid’s row must have 9 boxes!
-     */
-    public function testCheckGridVersusSymbolsUsingRowHavingNotEnoughBoxesTypeShouldRaiseInvalidArgumentException()
-    {
-        Grid::checkGridVersusSymbols(
-            [
-                ['a','z','e','r','t','y','u','i','o'],
-                ['a','z','e','r','t','y','u','i','o'],
-                ['a','z','e','r','t','y','u','i','o'],
-                ['a','z','e','r','t','y','u','i','o'],
-                ['a','z','e','r','t','y','u','i','o'],
-                ['a'],
-                ['a','z','e','r','t','y','u','i','o'],
-                ['a','z','e','r','t','y','u','i','o'],
-                ['a','z','e','r','t','y','u','i','o'],
-            ], 
-            ['a','z','e','r','t','y','u','i','o'],
-            '.'
-        );
-    }
-
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Grid’s row must have 9 boxes!
-     */
-    public function testCheckGridVersusSymbolsUsingRowHavingTooMuchBoxesTypeShouldRaiseInvalidArgumentException()
-    {
-        Grid::checkGridVersusSymbols(
-            [
-                ['a','z','e','r','t','y','u','i','o'],
-                ['a','z','e','r','t','y','u','i','o'],
-                ['a','z','e','r','t','y','u','i','o', 'p'],
-                ['a','z','e','r','t','y','u','i','o'],
-                ['a','z','e','r','t','y','u','i','o'],
-                ['a','z','e','r','t','y','u','i','o'],
-                ['a','z','e','r','t','y','u','i','o'],
-                ['a','z','e','r','t','y','u','i','o'],
-                ['a','z','e','r','t','y','u','i','o']
             ], 
             ['a','z','e','r','t','y','u','i','o'],
             '.'

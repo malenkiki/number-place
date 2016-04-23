@@ -4,6 +4,9 @@ namespace Malenki\Game\NumberPlace;
 
 class Grid
 {
+    protected $joker;
+    protected $grid;
+    protected $symbols;
     protected $use_diagonal = false;
 
     public static function checkJoker($joker)
@@ -19,7 +22,7 @@ class Grid
         return true;
     }
 
-    public static function checkSymbols($symbols, $joker)
+    public static function checkSymbols($symbols, $joker, $count)
     {
         if(!is_array($symbols)) {
             throw new \InvalidArgumentException('Symbols’ list should be an array!');
@@ -29,13 +32,17 @@ class Grid
             throw new \InvalidArgumentException('Joker should be a string!');
         }
 
-        if (count($symbols) !== 9) {
-            throw new \InvalidArgumentException('Standard grid must have 9 different symbols!');
+        if (!is_integer($count) || $count <= 0) {
+            throw new \InvalidArgumentException('Count must be positive not null integer!');
+        }
+
+        if (count($symbols) !== $count) {
+            throw new \InvalidArgumentException("This grid size require $count symbols!");
         }
 
         $uniq = array_unique($symbols);
 
-        if (count($uniq) < 9) {
+        if (count($uniq) < $count) {
             throw new \InvalidArgumentException('Symbols list has some duplicates!');
         }
 
@@ -55,20 +62,9 @@ class Grid
             throw new \InvalidArgumentException('Grid must be an array!');
         }
 
-        if (count($grid) !== 9) {
-            throw new \InvalidArgumentException('Grid must have 9 rows!');
-        }
-
-        self::checkJoker($joker);
-        self::checkSymbols($symbols, $joker);
-
         foreach ($grid as $row) {
             if (!is_array($row)) {
                 throw new \InvalidArgumentException('Grid’s row must be an array!');
-            }
-
-            if (count($row) !== 9) {
-                throw new \InvalidArgumentException('Grid’s row must have 9 boxes!');
             }
 
             foreach ($row as $box) {
@@ -86,6 +82,20 @@ class Grid
     }
 
 
+    public static function isValidSize($size)
+    {
+        // compute side size of basic area
+        $base = sqrt(sqrt($size));
+
+        // must be an integer
+        if (($base - (int) $base) != 0) {
+            return false;
+        }
+
+        // Cannot be smaller than 2
+        return $base >= 2;
+    }
+
 
     public static function stringToGrid($str)
     {
@@ -93,19 +103,23 @@ class Grid
             throw new \InvalidArgumentException('Argument must be a string!');
         }
 
-        if (mb_strlen($str, 'UTF-8') !== 81) {
-            throw new \InvalidArgumentException('Standard grid must have 81 boxes!');
+        $length = mb_strlen($str, 'UTF-8');
+
+        if (!self::isValidSize($length)) {
+            throw new \InvalidArgumentException('Not valid grid size!');
         }
 
         $arr = self::stringToArray($str);
-        return array_chunk($arr, 9);
+        return array_chunk($arr, sqrt($length));
     }
 
 
     public static function stringToArray($str)
     {
         if (!is_string($str)) {
-            throw new \InvalidArgumentException('To convert string to array, you must provide a string value as input!');
+            throw new \InvalidArgumentException(
+                'To convert string to array, you must provide a string value as input!'
+            );
         }
 
         $arr = preg_split('//u', $str);
@@ -115,15 +129,20 @@ class Grid
 
     protected function populate()
     {
-        foreach ($this->grid as &$row) {
-            foreach ($row as &$box) {
-                if ($box === $this->joker) {
-                    $box = new Box();
-                } else {
-                    $box = new Box($box, true);
+        foreach ($this->grid as $rowIndex => &$row) {
+            foreach ($row as $colIndex => &$cell) {
+                $box = new Box($rowIndex, $colIndex, $this);
+                
+                if ($cell !== $this->joker) {
+                    $box->setValue(array_flip($this->symbols)[$cell]);
+                    $box->setAsRevealed();
                 }
+
+                $cell = $box;
             }
         }
+
+        // TODO renseigner chaque cellule de leurs valeurs possibles
     }
 
 
@@ -133,7 +152,7 @@ class Grid
         $symbols = self::stringToArray($symbols);
 
         self::checkJoker($joker);
-        self::checkSymbols($symbols, $joker);
+        self::checkSymbols($symbols, $joker, count($grid));
         self::checkGridVersusSymbols($grid, $symbols, $joker);
 
         $this->joker = $joker;
@@ -141,6 +160,16 @@ class Grid
         $this->symbols = $symbols;
 
         $this->populate();
+    }
+
+    public function getJoker()
+    {
+        return $this->joker;
+    }
+
+    public function getSymbols()
+    {
+        return $this->symbols;
     }
 
     public function useDiagonal()

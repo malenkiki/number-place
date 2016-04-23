@@ -4,21 +4,53 @@ namespace Malenki\Game\NumberPlace;
 
 class Box
 {
+    protected $grid;
     protected $value = null;
 
     protected $revealed = false;
+    protected $coord;
 
     protected $canBe = array();
 
-    public function __construct($value = null, $revealed = false)
+    public function __construct($row, $col, Grid &$grid)
     {
-        if (is_string($value) && (mb_strlen($value, 'UTF-8') === 1)) {
-            $this->value = $value;
+        if (!is_integer($row) || $row < 0) {
+            throw new \InvalidArgumentException(
+                "Row's index must be a not negative integer!"
+            );
+        }
+        
+        if (!is_integer($col) || $col < 0) {
+            throw new \InvalidArgumentException(
+                "Column's index must be a not negative integer!"
+            );
         }
 
-        $this->revealed = (boolean) $revealed;
+        $this->grid = $grid;
+        
+        $this->coord = new \stdClass();
+        $this->coord->row = $row;
+        $this->coord->col = $col;
     }
 
+    public function setValue($value)
+    {
+        if (!is_integer($value) || $value < 0) {
+            throw new \InvalidArgumentException(
+                "Cell's value must be a not negative integer!"
+            );
+        }
+
+        $this->value = $value;
+
+        return $this;
+    }
+
+    public function setAsRevealed()
+    {
+        $this->revealed = true;
+        return $this;
+    }
 
     public function isRevealed()
     {
@@ -32,13 +64,11 @@ class Box
 
     public function clear()
     {
-        $this->value = null;
-        return $this;
-    }
+        if (!$this->revealed) {
+            $this->value = null;
+        }
 
-    public function clearPossibilities()
-    {
-        $this->canBe = [];
+        return $this;
     }
 
     public function mayBe($value)
@@ -46,6 +76,8 @@ class Box
         if (!in_array($value, $this->canBe)) {
             $this->canBe[] = $value;
         }
+
+        return $this;
     }
 
     public function mayNotBe($value)
@@ -59,6 +91,12 @@ class Box
 
     public function __toString()
     {
+        if (is_null($this->value)) {
+            return $this->grid->getJoker();
+        } else {
+            return $this->grid->getSymbols()[$this->value];
+        }
+
         return (string) $this->value;
     }
 }
