@@ -129,20 +129,52 @@ class Grid
 
     protected function populate()
     {
+        $rowsLocked = [];
+        $colsLocked = [];
+
         foreach ($this->grid as $rowIndex => &$row) {
             foreach ($row as $colIndex => &$cell) {
                 $box = new Box($rowIndex, $colIndex, $this);
                 
                 if ($cell !== $this->joker) {
-                    $box->setValue(array_flip($this->symbols)[$cell]);
+                    // Take numerical index in place of symbol
+                    $value = array_flip($this->symbols)[$cell];
+                    $box->setValue($value);
                     $box->setAsRevealed();
+
+                    if (!isset($rowsLocked[$rowIndex])) {
+                        $rowsLocked[$rowIndex] = []; 
+                    }
+                    $rowsLocked[$rowIndex][] = $value; 
+                    
+                    if (!isset($colsLocked[$colIndex])) {
+                        $colsLocked[$colIndex] = []; 
+                    }
+                    $colsLocked[$colIndex][] = $value; 
+                } else {
+                    $box->addPossible(array_keys($this->symbols));
                 }
 
                 $cell = $box;
             }
         }
 
-        // TODO renseigner chaque cellule de leurs valeurs possibles
+        
+        foreach ($this->grid as $rowIndex => &$row) {
+            foreach ($row as $colIndex => &$cell) {
+                if ($cell->isRevealed()) {
+                    continue;
+                }
+
+                if (isset($rowsLocked[$rowIndex])) {
+                    $cell->addImpossible($rowsLocked[$rowIndex]);
+                }
+
+                if (isset($colsLocked[$colIndex])) {
+                    $cell->addImpossible($colsLocked[$colIndex]);
+                }
+            }
+        }
     }
 
 

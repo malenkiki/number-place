@@ -10,7 +10,7 @@ class Box
     protected $revealed = false;
     protected $coord;
 
-    protected $canBe = array();
+    protected $mayBe = array();
 
     public function __construct($row, $col, Grid &$grid)
     {
@@ -46,6 +46,20 @@ class Box
         return $this;
     }
 
+    public function getValue()
+    {
+        return $this->value;
+    }
+
+    public function getSymbol()
+    {
+        if (is_null($this->value)) {
+            return $this->grid->getJoker();
+        }
+
+        return $this->grid->getSymbols()[$this->value];
+    }
+
     public function setAsRevealed()
     {
         $this->revealed = true;
@@ -71,32 +85,58 @@ class Box
         return $this;
     }
 
-    public function mayBe($value)
+    public function addPossible($value)
     {
-        if (!in_array($value, $this->canBe)) {
-            $this->canBe[] = $value;
+        if (!is_array($value) && !is_integer($value)) {
+            throw new \InvalidArgumentException('Possibles values must be an array of integers or an integer!');
         }
+
+        if (is_array($value)) {
+            foreach ($value as $v) {
+                $this->addPossible($v);
+            } 
+        }
+
+        if (is_integer($value) && !in_array($value, $this->mayBe)) {
+            $this->mayBe[] = $value;
+        }
+
+        $this->mayBe = array_unique($this->mayBe);
 
         return $this;
     }
 
-    public function mayNotBe($value)
+    public function addImpossible($value)
     {
-        if (in_array($value, $this->canBe)) {
-            $prov = array_flip($this->canBe);
-            unset($prov[$value]);
-            $this->canBe = array_values(array_flip($prov));
+        if (!is_array($value) && !is_integer($value)) {
+            throw new \InvalidArgumentException('Impossibles values must be an array of integers or an integer!');
         }
+
+        if (is_array($value)) {
+            foreach ($value as $v) {
+                $this->addImpossible($v);
+            } 
+        }
+
+        if (is_integer($value) && in_array($value, $this->mayBe)) {
+            $prov = array_flip($this->mayBe);
+            unset($prov[$value]);
+            $this->mayBe = array_values(array_flip($prov));
+        }
+    }
+
+    public function getPossibleValues()
+    {
+        return $this->mayBe;
+    }
+
+    public function randomize()
+    {
+        $this->value = $this->mayBe[mt_rand(0, count($this->mayBe) - 1)];
     }
 
     public function __toString()
     {
-        if (is_null($this->value)) {
-            return $this->grid->getJoker();
-        } else {
-            return $this->grid->getSymbols()[$this->value];
-        }
-
-        return (string) $this->value;
+        return $this->getSymbol();
     }
 }
