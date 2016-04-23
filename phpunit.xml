@@ -12,7 +12,6 @@
     stopOnFailure="false"
     stopOnIncomplete="false"
     stopOnSkipped="false"
-    strict="false"
     verbose="false"
     bootstrap="vendor/autoload.php"
     >
