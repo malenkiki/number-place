@@ -27,6 +27,12 @@ class Box
         }
 
         $this->grid = $grid;
+
+        $size = $this->grid->getSize();
+
+        if ($row >= $size || $col >= $size) {
+            throw new \OutOfRangeException('Coordinates must be inside grid!');
+        }
         
         $this->coord = new \stdClass();
         $this->coord->row = $row;
@@ -39,6 +45,14 @@ class Box
             throw new \InvalidArgumentException(
                 "Cell's value must be a not negative integer!"
             );
+        }
+
+        if ($value >= $this->grid->getSize()) {
+            throw new \OutOfRangeException("Cell's value must be into the range defined by the grid!");
+        }
+
+        if ($this->revealed) {
+            throw new \RuntimeException('Cannot change value of revealedCell!');
         }
 
         $this->value = $value;
@@ -58,6 +72,11 @@ class Box
         }
 
         return $this->grid->getSymbols()[$this->value];
+    }
+
+    public function getCoordinates()
+    {
+        return $this->coord;
     }
 
     public function setAsRevealed()
@@ -80,6 +99,8 @@ class Box
     {
         if (!$this->revealed) {
             $this->value = null;
+        } else {
+            throw new \RuntimeException('Cannot clear value of revealed cell!');
         }
 
         return $this;
@@ -132,6 +153,10 @@ class Box
 
     public function randomize()
     {
+        if ($this->revealed) {
+            throw new \RuntimeException('Cannot Randomized value of revealed cell!');
+        }
+
         $this->value = $this->mayBe[mt_rand(0, count($this->mayBe) - 1)];
     }
 

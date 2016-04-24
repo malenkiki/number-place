@@ -421,4 +421,10 @@ class Grid
 
         return true;
     }
+
+
+    public function getSize()
+    {
+        return count($this->grid);
+    }
 }
