@@ -205,4 +205,27 @@ class BoxTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(0, $coord->row);
         $this->assertEquals(1, $coord->col);
     }
+
+    public function testAddPossibleValuesOneByOneShouldSuccess()
+    {
+        $box = new Box(0, 1, new Grid('1234432112344321', '1234'));
+        $box->addPossible(1);
+        $box->addPossible(2);
+        $this->assertEquals([1,2], $box->getPossibles());
+    }
+
+    public function testAddPossibleValuesInOneShotShouldSuccess()
+    {
+        $box = new Box(0, 1, new Grid('1234432112344321', '1234'));
+        $box->addPossible([1,2]);
+        $this->assertEquals([1,2], $box->getPossibles());
+    }
+
+    public function testAddPossibleValuesInOneShotAndOneByOneShouldSuccess()
+    {
+        $box = new Box(0, 1, new Grid('1234432112344321', '1234'));
+        $box->addPossible([1,2]);
+        $box->addPossible(0);
+        $this->assertEquals([0, 1,2], $box->getPossibles());
+    }
 }

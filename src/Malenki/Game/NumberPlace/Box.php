@@ -146,8 +146,9 @@ class Box
         }
     }
 
-    public function getPossibleValues()
+    public function getPossibles()
     {
+        sort($this->mayBe, SORT_NUMERIC);
         return $this->mayBe;
     }
 
