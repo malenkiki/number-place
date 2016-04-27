@@ -127,6 +127,43 @@ class Grid
         return array_values($arr);
     }
 
+
+    public static function areaCoordFromGridCoord($row, $col, $size)
+    {
+        if (!is_integer($size) || $size <= 0) {
+            throw new \InvalidArgumentException('Size must be a positive not null integer!');
+        }
+
+        if (!is_integer($row) || $row >= $size || $row < 0) {
+            throw new \InvalidArgumentException(
+                sprintf("Row must be integer inside [0,%d[", $size)
+            );
+        }
+        if (!is_integer($col) || $col >= $size || $col < 0) {
+            throw new \InvalidArgumentException(
+                sprintf("Column must be integer inside [0,%d[", $size)
+            );
+        }
+        $area_size = sqrt($size);
+
+        $area_row = 0;
+        $area_col = 0;
+
+        for($r = 0; $r <= $row; $r++) {
+            if ($r > 0 && ($r % $area_size == 0)) {
+                $area_row++;
+            }
+        }
+        
+        for($c = 0; $c <= $col; $c++) {
+            if ($c > 0 && ($c % $area_size == 0)) {
+                $area_col++;
+            }
+        }
+
+        return "$area_row;$area_col";
+    }
+
     protected function populate()
     {
         $rowsLocked = [];
@@ -302,6 +339,7 @@ class Grid
 
         return $area;
     }
+
 
     protected function getCollection($idx, $type)
     {

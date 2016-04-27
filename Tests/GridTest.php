@@ -386,6 +386,111 @@ class GridTest extends \PHPUnit_Framework_TestCase
         ));
     }
 
+    /**
+     * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessage Row must be integer inside [0,9[
+     */
+    public function testGettingAreaCoordUsingBadRowTypeShouldRaiseInvalidArgumentException()
+    {
+        Grid::areaCoordFromGridCoord('foo', 4, 9);
+    }
+
+
+    /**
+     * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessage Column must be integer inside [0,9[
+     */
+    public function testGettingAreaCoordUsingBadColTypeShouldRaiseInvalidArgumentException()
+    {
+        Grid::areaCoordFromGridCoord(4, 'bar', 9);
+    }
+
+
+    /**
+     * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessage Size must be a positive not null integer!
+     */
+    public function testGettingAreaCoordUsingBadSizeTypeShouldRaiseInvalidArgumentException()
+    {
+        Grid::areaCoordFromGridCoord(4, 4, 'thing');
+    }
+
+
+    /**
+     * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessage Row must be integer inside [0,9[
+     */
+    public function testGettingAreaCoordUsingNegativeRowShouldRaiseInvalidArgumentException()
+    {
+        Grid::areaCoordFromGridCoord(-4, 4, 9);
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessage Row must be integer inside [0,9[
+     */
+    public function testGettingAreaCoordUsingRowTooGreatShouldRaiseInvalidArgumentException()
+    {
+        Grid::areaCoordFromGridCoord(9, 4, 9);
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessage Column must be integer inside [0,9[
+     */
+    public function testGettingAreaCoordUsingNegativeColShouldRaiseInvalidArgumentException()
+    {
+        Grid::areaCoordFromGridCoord(4, -4, 9);
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessage Column must be integer inside [0,9[
+     */
+    public function testGettingAreaCoordUsingColTooGreatShouldRaiseInvalidArgumentException()
+    {
+        Grid::areaCoordFromGridCoord(4, 9, 9);
+    }
+
+
+
+    /**
+     * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessage Size must be a positive not null integer!
+     */
+    public function testGettingAreaCoordUsingNegativeSizeTypeShouldRaiseInvalidArgumentException()
+    {
+        Grid::areaCoordFromGridCoord(4, 4, -9);
+    }
+
+
+    /**
+     * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessage Size must be a positive not null integer!
+     */
+    public function testGettingAreaCoordUsingZeroAsSizeTypeShouldRaiseInvalidArgumentException()
+    {
+        Grid::areaCoordFromGridCoord(4, 4, 0);
+    }
+
+
+    public function testGettingAreaCoordinatesFromCellCoordinatesShouldSuccess()
+    {
+        $this->assertEquals('0;0', Grid::areaCoordFromGridCoord(1, 0, 4));
+        $this->assertEquals('1;1', Grid::areaCoordFromGridCoord(2, 3, 4));
+        $this->assertEquals('1;1', Grid::areaCoordFromGridCoord(3, 3, 4));
+
+        $this->assertEquals('0;0', Grid::areaCoordFromGridCoord(1, 2, 9));
+        $this->assertEquals('0;1', Grid::areaCoordFromGridCoord(0, 4, 9));
+        $this->assertEquals('2;2', Grid::areaCoordFromGridCoord(7, 8, 9));
+        
+        $this->assertEquals('0;0', Grid::areaCoordFromGridCoord(0, 0, 16));
+        $this->assertEquals('0;0', Grid::areaCoordFromGridCoord(3, 3, 16));
+        $this->assertEquals('1;1', Grid::areaCoordFromGridCoord(4, 4, 16));
+        $this->assertEquals('0;3', Grid::areaCoordFromGridCoord(3, 15, 16));
+        $this->assertEquals('3;0', Grid::areaCoordFromGridCoord(15, 2, 16));
+        $this->assertEquals('3;3', Grid::areaCoordFromGridCoord(12, 15, 16));
+    }
 
     public function testInstanciateUsingValidArgumentsShouldSuccess()
     {
