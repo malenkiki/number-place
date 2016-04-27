@@ -211,6 +211,7 @@ class BoxTest extends \PHPUnit_Framework_TestCase
         $box = new Box(0, 1, new Grid('1234432112344321', '1234'));
         $box->addPossible(1);
         $box->addPossible(2);
+        $box->addPossible(2);
         $this->assertEquals([1,2], $box->getPossibles());
     }
 
@@ -225,7 +226,25 @@ class BoxTest extends \PHPUnit_Framework_TestCase
     {
         $box = new Box(0, 1, new Grid('1234432112344321', '1234'));
         $box->addPossible([1,2]);
+        $box->addPossible([1,2]);
         $box->addPossible(0);
         $this->assertEquals([0, 1,2], $box->getPossibles());
+    }
+
+    public function testAddImpossibleValuesInOneShotShouldSuccess()
+    {
+        $box = new Box(0, 1, new Grid('1234432112344321', '1234'));
+        $box->addPossible(range(0,3));
+        $box->addImpossible([0, 2]);
+        $this->assertEquals([1, 3], $box->getPossibles());
+    }
+
+    public function testAddImpossibleValuesInOneShotAndOneByOneShouldSuccess()
+    {
+        $box = new Box(0, 1, new Grid('1234432112344321', '1234'));
+        $box->addPossible(range(0, 3));
+        $box->addImpossible([1,2]);
+        $box->addImpossible(0);
+        $this->assertEquals([3], $box->getPossibles());
     }
 }

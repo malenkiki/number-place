@@ -168,6 +168,7 @@ class Grid
     {
         $rowsLocked = [];
         $colsLocked = [];
+        $areasLocked = [];
 
         foreach ($this->grid as $rowIndex => &$row) {
             foreach ($row as $colIndex => &$cell) {
@@ -188,6 +189,14 @@ class Grid
                         $colsLocked[$colIndex] = []; 
                     }
                     $colsLocked[$colIndex][] = $value; 
+
+                    $areaIndex = self::areaCoordFromGridCoord($rowIndex, $colIndex, count($this->grid));
+                    
+                    if (!isset($areasLocked[$areaIndex])) {
+                        $areasLocked[$areaIndex] = []; 
+                    }
+                    $areasLocked[$areaIndex][] = $value; 
+
                 } else {
                     $box->addPossible(array_keys($this->symbols));
                 }
@@ -210,6 +219,12 @@ class Grid
                 if (isset($colsLocked[$colIndex])) {
                     $cell->addImpossible($colsLocked[$colIndex]);
                 }
+                
+                $areaIndex = self::areaCoordFromGridCoord($rowIndex, $colIndex, count($this->grid));
+                if (isset($areasLocked[$areaIndex])) {
+                    $cell->addImpossible($areasLocked[$areaIndex]);
+                }
+                
             }
         }
     }
