@@ -226,6 +226,12 @@ class Grid
 
     public function getRowAt($idx)
     {
+        if (!isset($this->grid[$idx])) {
+            throw new \OutOfRangeException(
+                "Row's index is not defined for this grid!"
+            );
+        }
+
         return $this->grid[$idx];
     }
 
@@ -234,6 +240,11 @@ class Grid
         $out = [];
 
         foreach ($this->grid as $row) {
+            if (!isset($row[$idx])) {
+                throw new \OutOfRangeException(
+                    "Column's index is not defined for this grid!"
+                );
+            }
             $out[] = $row[$idx];
         }
 
@@ -242,11 +253,13 @@ class Grid
 
     public function getDiagonalAt($idx)
     {
+        if ($idx !== 0 && $idx !== 1) {
+            throw new \OutOfRangeException("Diagonal's index must be 0 or 1!");
+        }
+
         $out = [];
 
-        for ($i = 0; $i < 9; $i++) {
-            $row = $this->getRowAt($i);
-            
+        foreach ($this->grid as $i => $row) {
             if ($idx) {
                 $row = array_reverse($row);
             }
@@ -259,17 +272,31 @@ class Grid
 
     public function getAreaAt($idx)
     {
-        if (!preg_match('/^(0|1|2);(0|1|2)$/', $idx)) {
-            throw new \InvalidArgumentException('todo');
+        if (!preg_match('/^[0-9]+;[0-9]+$/', $idx)) {
+            throw new \InvalidArgumentException("Area's coordinates not valid!");
         }
 
-        list($col, $row) = explode(';', $idx);
+        list($row, $col) = explode(';', $idx);
 
-        $grid = array_chunk($this->grid, 3);
+        $area_size = sqrt(count($this->grid));
+
+        $grid = array_chunk($this->grid, $area_size);
 
         $area = [];
+
+        if (!isset($grid[$row])) {
+            throw new \OutOfRangeException(
+                "Area's row index is not defined for this grid!"
+            );
+        }
+
         foreach ($grid[$row] as $sub_row) {
-            $chunk = array_chunk($sub_row, 3);
+            $chunk = array_chunk($sub_row, $area_size);
+            if (!isset($chunk[$col])) {
+                throw new \OutOfRangeException(
+                    "Area's col index is not defined for this grid!"
+                );
+            }
             $area = array_merge($area, $chunk[$col]);
         }
 

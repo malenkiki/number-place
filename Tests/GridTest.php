@@ -63,7 +63,7 @@ class GridTest extends \PHPUnit_Framework_TestCase
     /**
      * @expectedException \InvalidArgumentException
      */
-    public function testStringToGridShouldRaiseInvalidArgumentExceptionIfItHasMoreThan81Chars()
+    public function testStringToGridShouldRaiseInvalidArgumentExceptionIfItHasNotAllowedCharsLength()
     {
         $str = '123456789123456789123456789';
         $str .= '123456789123456789123456789';
@@ -74,6 +74,27 @@ class GridTest extends \PHPUnit_Framework_TestCase
         $str .= '123456789123456789123456789';
         Grid::stringToGrid($str);
     }
+
+    public function testStringToGridUsingStringOf16CharsShouldSuccess()
+    {
+        $str = '1234342143211432';
+        $grid = Grid::stringToGrid($str);
+        $this->assertCount(4, $grid);
+
+        foreach ($grid as $row) {
+            $this->assertCount(4, $row);
+        }
+
+        $expected = array(
+            ['1','2','3','4'],
+            ['3','4','2','1'],
+            ['4','3','2','1'],
+            ['1','4','3','2']
+        );
+        $this->assertEquals($expected, $grid);
+    }
+
+
 
     public function testStringToGridUsingStringOf81CharsShouldSuccess()
     {
@@ -97,6 +118,52 @@ class GridTest extends \PHPUnit_Framework_TestCase
             ['1','2','3','4','5','6','7','8','9'],
             ['1','2','3','4','5','6','7','8','9'],
             ['1','2','3','4','5','6','7','8','9']
+        );
+        $this->assertEquals($expected, $grid);
+    }
+
+    public function testStringToGridUsingStringOf256CharsShouldSuccess()
+    {
+        $str  = '123456789ABCDEFG';
+        $str .= '123456789ABCDEFG';
+        $str .= '123456789ABCDEFG';
+        $str .= '123456789ABCDEFG';
+        $str .= '123456789ABCDEFG';
+        $str .= '123456789ABCDEFG';
+        $str .= '123456789ABCDEFG';
+        $str .= '123456789ABCDEFG';
+        $str .= '123456789ABCDEFG';
+        $str .= '123456789ABCDEFG';
+        $str .= '123456789ABCDEFG';
+        $str .= '123456789ABCDEFG';
+        $str .= '123456789ABCDEFG';
+        $str .= '123456789ABCDEFG';
+        $str .= '123456789ABCDEFG';
+        $str .= '123456789ABCDEFG';
+        $grid = Grid::stringToGrid($str);
+        $this->assertCount(16, $grid);
+
+        foreach ($grid as $row) {
+            $this->assertCount(16, $row);
+        }
+
+        $expected = array(
+            ['1','2','3','4','5','6','7','8','9','A','B','C','D','E','F','G'],
+            ['1','2','3','4','5','6','7','8','9','A','B','C','D','E','F','G'],
+            ['1','2','3','4','5','6','7','8','9','A','B','C','D','E','F','G'],
+            ['1','2','3','4','5','6','7','8','9','A','B','C','D','E','F','G'],
+            ['1','2','3','4','5','6','7','8','9','A','B','C','D','E','F','G'],
+            ['1','2','3','4','5','6','7','8','9','A','B','C','D','E','F','G'],
+            ['1','2','3','4','5','6','7','8','9','A','B','C','D','E','F','G'],
+            ['1','2','3','4','5','6','7','8','9','A','B','C','D','E','F','G'],
+            ['1','2','3','4','5','6','7','8','9','A','B','C','D','E','F','G'],
+            ['1','2','3','4','5','6','7','8','9','A','B','C','D','E','F','G'],
+            ['1','2','3','4','5','6','7','8','9','A','B','C','D','E','F','G'],
+            ['1','2','3','4','5','6','7','8','9','A','B','C','D','E','F','G'],
+            ['1','2','3','4','5','6','7','8','9','A','B','C','D','E','F','G'],
+            ['1','2','3','4','5','6','7','8','9','A','B','C','D','E','F','G'],
+            ['1','2','3','4','5','6','7','8','9','A','B','C','D','E','F','G'],
+            ['1','2','3','4','5','6','7','8','9','A','B','C','D','E','F','G']
         );
         $this->assertEquals($expected, $grid);
     }
@@ -158,6 +225,8 @@ class GridTest extends \PHPUnit_Framework_TestCase
     public function testCheckSymbolsUsingValidArraySymbolsAndValidJokerCharShouldReturnTrue()
     {
         $this->assertTrue(Grid::checkSymbols(['a','z','e','r','t','y','u','i','o'], '.', 9));
+        $this->assertTrue(Grid::checkSymbols(['a','z','e','r'], '.', 4));
+        $this->assertTrue(Grid::checkSymbols(['1','2','3','4','5','6','7','8','9','A','B','C','D','E','F','G'], '.', 16));
     }
 
     /**
@@ -276,6 +345,16 @@ class GridTest extends \PHPUnit_Framework_TestCase
     {
         $this->assertTrue(Grid::checkGridVersusSymbols(
             [
+                ['a','z','e','r'],
+                ['a','z','e','r'],
+                ['a','z','.','r'],
+                ['a','z','e','r']
+            ], 
+            ['a','z','e','r'],
+            '.'
+        ));
+        $this->assertTrue(Grid::checkGridVersusSymbols(
+            [
                 ['a','z','e','r','t','y','u','i','o'],
                 ['a','z','e','r','t','y','u','i','o'],
                 ['a','z','.','r','t','.','u','i','o'],
@@ -367,6 +446,7 @@ class GridTest extends \PHPUnit_Framework_TestCase
         $row = $grid->getRowAt(1);
 
         $this->assertInternalType('array', $row);
+        $this->assertCount(9, $row);
         
         $this->assertInternalType('object', $row[0]);
         $this->assertInternalType('object', $row[1]);
@@ -422,6 +502,7 @@ class GridTest extends \PHPUnit_Framework_TestCase
         $col = $grid->getColAt(7);
 
         $this->assertInternalType('array', $col);
+        $this->assertCount(9, $col);
         
         $this->assertInternalType('object', $col[0]);
         $this->assertInternalType('object', $col[1]);
@@ -462,6 +543,37 @@ class GridTest extends \PHPUnit_Framework_TestCase
     
     public function testGettingSpecificAreaShouldReturnIt()
     {
+        $str  = 'ABCD';
+        $str .= '.C..';
+        $str .= 'DA..';
+        $str .= 'C.A.';
+        
+        $grid = new Grid($str, 'ABCD', '.');
+        $area = $grid->getAreaAt('1;0');
+        
+        $this->assertInternalType('array', $area);
+        $this->assertCount(4, $area);
+        
+        $this->assertInternalType('object', $area[0]);
+        $this->assertInternalType('object', $area[1]);
+        $this->assertInternalType('object', $area[2]);
+        $this->assertInternalType('object', $area[3]);
+
+        $this->assertEquals('D', $area[0]);
+        $this->assertEquals('A', $area[1]);
+        $this->assertEquals('C', $area[2]);
+
+        $this->assertTrue($area[0]->isRevealed());
+        $this->assertTrue($area[1]->isRevealed());
+        $this->assertTrue($area[2]->isRevealed());
+        
+        $this->assertFalse($area[0]->isVoid());
+        $this->assertFalse($area[1]->isVoid());
+        $this->assertFalse($area[2]->isVoid());
+
+        $this->assertFalse($area[3]->isRevealed());
+        $this->assertTrue($area[3]->isVoid());
+
         $str  = 'C...E..A.';
         $str .= 'EI...D.F.';
         $str .= '.........';
@@ -473,9 +585,10 @@ class GridTest extends \PHPUnit_Framework_TestCase
         $str .= '.........';
 
         $grid = new Grid($str, 'ABCDEFGHI', '.');
-        $area = $grid->getAreaAt('2;0');
+        $area = $grid->getAreaAt('0;2');
 
         $this->assertInternalType('array', $area);
+        $this->assertCount(9, $area);
         
         $this->assertInternalType('object', $area[0]);
         $this->assertInternalType('object', $area[1]);
@@ -569,7 +682,7 @@ class GridTest extends \PHPUnit_Framework_TestCase
         $str .= '.........';
 
         $grid = new Grid($str, 'ABCDEFGHI', '.');
-        $diag = $grid->getDiagonalAt('0');
+        $diag = $grid->getDiagonalAt(0);
 
         $this->assertEquals('C', $diag[0]);
         $this->assertEquals('I', $diag[1]);
@@ -599,6 +712,84 @@ class GridTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($diag[7]->isVoid());
         $this->assertTrue($diag[8]->isVoid());
     }
+
+    /**
+     * @expectedException \OutOfRangeException
+     * @expectedExceptionMessage Row's index is not defined for this grid!
+     */
+    public function testGettingNonExistingRowIndexShouldRaiseOutOfRangeException()
+    {
+        $str  = 'ABCD';
+        $str .= '.C..';
+        $str .= 'DA..';
+        $str .= 'C.A.';
+        
+        $grid = new Grid($str, 'ABCD', '.');
+        $area = $grid->getRowAt(4);
+    }
+
+
+    /**
+     * @expectedException \OutOfRangeException
+     * @expectedExceptionMessage Column's index is not defined for this grid!
+     */
+    public function testGettingNonExistingColumnIndexShouldRaiseOutOfRangeException()
+    {
+        $str  = 'ABCD';
+        $str .= '.C..';
+        $str .= 'DA..';
+        $str .= 'C.A.';
+        
+        $grid = new Grid($str, 'ABCD', '.');
+        $area = $grid->getColAt(4);
+    }
+
+
+    /**
+     * @expectedException \OutOfRangeException
+     * @expectedExceptionMessage Diagonal's index must be 0 or 1!
+     */
+    public function testGettingNonExistingDiagonalIndexShouldRaiseOutOfRangeException()
+    {
+        $str  = 'ABCD';
+        $str .= '.C..';
+        $str .= 'DA..';
+        $str .= 'C.A.';
+        
+        $grid = new Grid($str, 'ABCD', '.');
+        $area = $grid->getDiagonalAt(2);
+    }
+
+    /**
+     * @expectedException \OutOfRangeException
+     * @expectedExceptionMessage Area's row index is not defined for this grid!
+     */
+    public function testGettingNonExistingAreaRowShouldRaiseOutOfRangeException()
+    {
+        $str  = 'ABCD';
+        $str .= '.C..';
+        $str .= 'DA..';
+        $str .= 'C.A.';
+        
+        $grid = new Grid($str, 'ABCD', '.');
+        $area = $grid->getAreaAt('2;0');
+    }
+
+    /**
+     * @expectedException \OutOfRangeException
+     * @expectedExceptionMessage Area's col index is not defined for this grid!
+     */
+    public function testGettingNonExistingAreaColumnShouldRaiseOutOfRangeException()
+    {
+        $str  = 'ABCD';
+        $str .= '.C..';
+        $str .= 'DA..';
+        $str .= 'C.A.';
+        
+        $grid = new Grid($str, 'ABCD', '.');
+        $area = $grid->getAreaAt('0;2');
+    }
+    
     
     public function testCheckingRowShouldSuccess()
     {
